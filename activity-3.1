@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+contract Donation{
+
+    uint256 public goal = 10**18;
+    address beneficiary; //deployer
+    mapping (address => uint256) public donorToContribution;
+
+    constructor (uint256 _goal) {
+        goal = _goal; 
+        beneficiary = msg.sender;
+    }
+
+    function donate() public payable{
+        require(msg.value > 0, "You didn't send tmoney");
+        donorToContribution[msg.sender] += msg.value;
+    }
+
+    function withdraw() public {
+        require(msg.sender == beneficiary, "You are not the benficiary");
+        uint256 balance = address(this).balance;
+        require(balance>= goal, "You can't transfer money yet!");
+        payable (beneficiary).transfer(balance); // current contract
+    }
+}
